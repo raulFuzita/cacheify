@@ -1,7 +1,7 @@
 import pytest
 import threading, time
 from collections.abc import Iterable
-from cache.local.local_cache import LocalCache
+from cacheify.cache.local.local_cache import LocalCache
 
 @pytest.fixture
 def cache():

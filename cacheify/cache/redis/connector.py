@@ -1,6 +1,6 @@
 import redis
 from utils import get_env_var
-from cache.singleton import Singleton
+from cacheify.cache.singleton import Singleton
 
 class RedisConnector(metaclass=Singleton):
     """

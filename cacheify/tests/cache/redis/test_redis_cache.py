@@ -1,7 +1,7 @@
 import pytest
 import threading, time
 from collections.abc import Iterable
-from cache.redis.redis_cache import RedisCache
+from cacheify.cache.redis.redis_cache import RedisCache
 
 @pytest.fixture
 def cache() -> RedisCache:

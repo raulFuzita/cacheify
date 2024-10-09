@@ -1,7 +1,7 @@
 import pytest
-from cache.cache_factory import CacheifyFactory
-from cache.local.local_cache import LocalCache
-from cache.redis.redis_cache import RedisCache
+from cacheify.cache.cache_factory import CacheifyFactory
+from cacheify.cache.local.local_cache import LocalCache
+from cacheify.cache.redis.redis_cache import RedisCache
 
 def test_get_local_cache_with_custom_key():
     factory = CacheifyFactory(cache_type='local')

@@ -15,7 +15,7 @@ def get_env_var(name, default=None, var_type=str):
         return default
 
     try:
-        if var_type == bool:
+        if var_type == bool and isinstance(value, str):
             # Convert to boolean: True if the string is 'true' (case insensitive), else False
             return value.lower() in ['true', '1', 'yes', 'y', 'on']
         elif var_type == int:

@@ -1,0 +1,63 @@
+name: Unit and Integration Tests CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install Redis on macOS using Homebrew
+      - name: Install Redis on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install redis
+          brew services start redis
+
+      # Use Docker for Redis on Linux and expose to the network
+      - name: Set up Redis via Docker (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          docker run -d -p 6379:6379 --name redis redis:latest
+          echo "::set-output name=redis-host::$(hostname -I | awk '{print $1}')"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      # Set PYTHONPATH correctly for Linux/macOS
+      - name: Set PYTHONPATH (Linux/macOS)
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+
+      # Wait for Redis to be ready (Linux/macOS)
+      - name: Wait for Redis to be ready (Linux/macOS)
+        run: |
+          redis_host="${{ env.REDIS_HOST || 'localhost' }}"
+          until nc -z $redis_host 6379; do
+            echo "Waiting for Redis on $redis_host...";
+            sleep 1;
+          done
+
+      - name: List files in current directory
+        run: ls -R  # List the entire directory structure for debugging
+
+      - name: Run tests
+        working-directory: ./cacheify  # Adjust this if your tests are in a different folder
+        run: pytest ./tests

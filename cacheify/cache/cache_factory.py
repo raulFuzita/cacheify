@@ -1,6 +1,6 @@
-from cache.cacheable import Cacheable
-from cache.local.local_cache import LocalCache
-from cache.redis.redis_cache import RedisCache
+from cacheify.cache.cacheable import Cacheable
+from cacheify.cache.local.local_cache import LocalCache
+from cacheify.cache.redis.redis_cache import RedisCache
 
 class CacheifyFactory:
     def __init__(self, cache_type: str='local'):

@@ -60,3 +60,7 @@ def test_get_env_var_invalid_bool():
     os.environ['TEST_INVALID_BOOL'] = 'notabool'
     result = get_env_var('TEST_INVALID_BOOL', default=False, var_type=bool)
     assert result is False
+
+def test_get_env_var_default_value_with_type_bool():
+    result = get_env_var('NON_EXISTENT_VAR', default=True, var_type=bool)
+    assert result is True

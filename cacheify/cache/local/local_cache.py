@@ -2,7 +2,7 @@ import threading
 from typing import Optional
 from redis import Redis
 from pottery import RedisDict
-from cache.cacheable import Cacheable
+from cacheify.cache.cacheable import Cacheable
 from .connector import RedisConnector
 
 class LocalCache(Cacheable):

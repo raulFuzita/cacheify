@@ -1,6 +1,6 @@
 import redis
 import fakeredis
-from cache.singleton import Singleton
+from cacheify.cache.singleton import Singleton
 
 class RedisConnector(metaclass=Singleton):
     """

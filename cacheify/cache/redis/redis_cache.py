@@ -2,7 +2,7 @@ import threading
 from typing import Union, List
 from redis import Redis
 from pottery import Redlock, RedisDict
-from cache.cacheable import Cacheable
+from cacheify.cache.cacheable import Cacheable
 from .connector import RedisConnector
 
 class RedisCache(Cacheable):
