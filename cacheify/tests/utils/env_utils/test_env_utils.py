@@ -1,42 +1,42 @@
-import os
 import pytest
+from pytest import MonkeyPatch
 from cacheify.utils import get_env_var
 
-def test_get_env_var_int():
-    os.environ['TEST_INT'] = '42'
+def test_get_env_var_int(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_INT', '42')
     result = get_env_var('TEST_INT', var_type=int)
     assert result == 42
     assert isinstance(result, int)
 
-def test_get_env_var_float():
-    os.environ['TEST_FLOAT'] = '3.14'
+def test_get_env_var_float(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_FLOAT', '3.14')
     result = get_env_var('TEST_FLOAT', var_type=float)
     assert result == 3.14
     assert isinstance(result, float)
 
-def test_get_env_var_bool_true():
-    os.environ['TEST_BOOL'] = 'true'
+def test_get_env_var_bool_true(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_BOOL', 'true')
     result = get_env_var('TEST_BOOL', var_type=bool)
     assert result is True
     assert isinstance(result, bool)
 
-def test_get_env_var_bool_false():
-    os.environ['TEST_BOOL'] = 'false'
+def test_get_env_var_bool_false(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_BOOL', 'false')
     result = get_env_var('TEST_BOOL', var_type=bool)
     assert result is False
     assert isinstance(result, bool)
 
-def test_get_env_var_bool_numeric():
-    os.environ['TEST_BOOL'] = '1'
+def test_get_env_var_bool_numeric(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_BOOL', '1')
     result = get_env_var('TEST_BOOL', var_type=bool)
     assert result is True
 
-    os.environ['TEST_BOOL'] = '0'
+    monkeypatch.setenv('TEST_BOOL', '0')
     result = get_env_var('TEST_BOOL', var_type=bool)
     assert result is False
 
-def test_get_env_var_string():
-    os.environ['TEST_STRING'] = 'Hello World'
+def test_get_env_var_string(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_STRING', 'Hello World')
     result = get_env_var('TEST_STRING', var_type=str)
     assert result == 'Hello World'
     assert isinstance(result, str)
@@ -46,21 +46,41 @@ def test_get_env_var_default_value():
     assert result == 'default_value'
     assert isinstance(result, str)
 
-def test_get_env_var_invalid_int():
-    os.environ['TEST_INVALID_INT'] = 'invalid'
+def test_get_env_var_invalid_int(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_INVALID_INT', 'invalid')
     result = get_env_var('TEST_INVALID_INT', default=0, var_type=int)
     assert result == 0
 
-def test_get_env_var_invalid_float():
-    os.environ['TEST_INVALID_FLOAT'] = 'invalid'
+def test_get_env_var_invalid_float(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_INVALID_FLOAT', 'invalid')
     result = get_env_var('TEST_INVALID_FLOAT', default=0.0, var_type=float)
     assert result == 0.0
 
-def test_get_env_var_invalid_bool():
-    os.environ['TEST_INVALID_BOOL'] = 'notabool'
+def test_get_env_var_invalid_bool(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_INVALID_BOOL', 'notabool')
     result = get_env_var('TEST_INVALID_BOOL', default=False, var_type=bool)
     assert result is False
 
 def test_get_env_var_default_value_with_type_bool():
     result = get_env_var('NON_EXISTENT_VAR', default=True, var_type=bool)
     assert result is True
+
+def test_get_env_var_with_list(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_LIST', '[1, 2, 3]')
+    result = get_env_var('TEST_LIST', var_type=list)
+    assert result == [1, 2, 3]
+
+def test_get_env_var_with_tuple(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_TUPLE', '[1, 2, 3]')
+    result = get_env_var('TEST_TUPLE', var_type=tuple)
+    assert result == (1, 2, 3)
+
+def test_get_env_var_with_dict(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_DICT', '{"key": "value"}')
+    result = get_env_var('TEST_DICT', var_type=dict)
+    assert result == {"key": "value"}
+
+def test_get_env_var_with_set(monkeypatch: MonkeyPatch):
+    monkeypatch.setenv('TEST_SET', '[1, 2, 3]')
+    result = get_env_var('TEST_SET', var_type=set)
+    assert result == {1, 2, 3}
