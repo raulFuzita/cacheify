@@ -1,30 +1,31 @@
 import threading
-from typing import Union, List
+from typing import Union, List, Set
 from redis import Redis
 from pottery import Redlock, RedisDict
 from cacheify.cache.cacheable import Cacheable
 from .connector import RedisConnector
 
 class RedisCache(Cacheable):
-    def __init__(self, *, key: str='cache', masters: Union[Redis, list, None]=None, auto_release_time: float=10, **kwargs):
+    def __init__(self, *, key: str='cache', masters: Union[Redis, set, None]=None, auto_release_time: float=10, **kwargs):
         self._key = key
         self.masters = self._normalize_masters(masters)
+        self.master = next(iter(self.masters))
         self.auto_release_time = auto_release_time
-        self._cache = RedisDict(redis=self.masters[0], key=key)
+        self._cache = RedisDict(redis=self.master, key=key)
         self._semaphore = threading.Semaphore(1)  # A binary semaphore to allow one thread at a time
 
-    def _normalize_masters(self, masters: Union[Redis, list, None]=None) -> List[Redis]:
-        if isinstance(masters, list):
+    def _normalize_masters(self, masters: Union[Redis, set, None]=None) -> Set[Redis]:
+        if isinstance(masters, set):
             return masters
         elif isinstance(masters, Redis):
-            return [masters]
+            return {masters}
         else:
-            return [RedisConnector()]
+            return {RedisConnector()}
 
     @property
     def redlock(self) -> Redlock:
         """A property to get a new Redlock instance."""
-        return Redlock(key=self._key, masters=self.masters, auto_release_time=self.auto_release_time)
+        return Redlock(key=self._key, masters=self.masters, raise_on_redis_errors=True, auto_release_time=self.auto_release_time)
     
     @property
     def key(self):

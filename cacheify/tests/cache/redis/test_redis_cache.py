@@ -113,6 +113,22 @@ def test_cache_len(cache: RedisCache):
     cache.set('key17', 'value17')
     assert len(cache) == 2
 
+@pytest.mark.unit_test_with_redis
+def test_redis_pause_connection_failure(cache: RedisCache):
+    # Pause the Redis connection in milliseconds
+    cache.master.client_pause(5000)
+    
+    # Expect a failure when attempting to set a key during the pause
+    with pytest.raises(Exception):
+        cache.set('paused_key', 'paused_value')
+
+    cache.master.client_unpause() # Unpausing the Redis connection
+
+    # After the pause, the Redis connection should work again
+    cache.set('key_after_pause', 'value_after_pause')
+    assert cache.get('key_after_pause') == 'value_after_pause'
+
+@pytest.mark.timeout(900)
 def test_thread_safety(cache: RedisCache):
     
     def set_values():

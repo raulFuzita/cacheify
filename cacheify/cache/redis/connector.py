@@ -8,6 +8,8 @@ class RedisConnector(metaclass=Singleton):
     It initializes a connection pool and provides a Redis connection instance.
     """
 
+    DEFAULT_CONFIG = {"socket_connect_timeout": 2, "socket_timeout": 3}
+
     def __new__(cls, *args, **kwargs):
         # Check if an instance already exists
         if not hasattr(cls, '_instance'):
@@ -21,11 +23,9 @@ class RedisConnector(metaclass=Singleton):
     def _initialize_connection(self) -> None:
         # Initialize the connection pool and create Redis connection
         url_connection = get_env_var('REDIS_URL', 'redis://localhost:6379/0')
-        decode_responses = get_env_var("REDIS_DECODE_RESPONSES", False, bool)
-        self._pool = redis.ConnectionPool.from_url(
-            url_connection,
-            decode_responses=decode_responses
-        )
+        # Assuming the configuration is stored as a JSON string in an environment variable
+        redis_config = get_env_var("REDIS_CONFIG", RedisConnector.DEFAULT_CONFIG, dict)
+        self._pool = redis.ConnectionPool.from_url(url_connection, **redis_config)
         # Set up the connection attribute
         self._conn = redis.StrictRedis(connection_pool=self._pool)
 
