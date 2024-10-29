@@ -4,8 +4,9 @@ from cacheify.cache.singleton import Singleton
 
 class RedisConnector(metaclass=Singleton):
     """
-    RedisConnector is a singleton class that manages the connection to a Redis database.
-    It initializes a connection pool and provides a Redis connection instance.
+    RedisConnector is a singleton that uses fakeredis to simulate a Redis instance
+    for local development and testing. It provides a shared, in-memory Redis-like
+    connection without using a connection pool.
     """
 
     def __new__(cls, *args, **kwargs):
